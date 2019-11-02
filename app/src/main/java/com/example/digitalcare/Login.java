@@ -38,6 +38,10 @@ public class Login extends AppCompatActivity {
             Toast.makeText(this, user.getEmail(), Toast.LENGTH_SHORT).show();
 
         }*/
+        if (mAuth.getUid() != null){
+            Intent i = new Intent(Login.this,Main2Activity.class);
+            startActivity(i);
+        }
         Toast.makeText(this, mAuth.getUid(), Toast.LENGTH_SHORT).show();
     }
 
@@ -63,8 +67,8 @@ public class Login extends AppCompatActivity {
                                     updateUI(user);*/
                                     //Toast.makeText(Login.this, "Signed in", Toast.LENGTH_SHORT).show();
 
-                                    /*Intent i = new Intent(Login.this,Main2Activity.class);
-                                    startActivity(i);*/
+                                    Intent i = new Intent(Login.this,Main2Activity.class);
+                                    startActivity(i);
                                     progressDialog.hide();
                                     Toast.makeText(Login.this, "Success", Toast.LENGTH_SHORT).show();
 
