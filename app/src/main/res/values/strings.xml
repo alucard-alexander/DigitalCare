@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Digital Care</string>
+    <string name="regUserName">Enter the User Name</string>
+    <string name="regPass">Enter Your Password</string>
+    <string name="regRePass">Retype the Password</string>
+    <string name="regMobile">Enter your Mobile Number</string>
+    <string name="regEmail">Enter your email address</string>
+    <string name="Registration">Sign up</string>
+    <string name="fullName">Enter Full Name</string>
+    <string name="logIn">Log In</string>
+    <string name="signIn">Sign In</string>
+    <string name="title_activity_maps">Map</string>
+</resources>

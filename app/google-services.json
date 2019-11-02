@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "829950891711",
+    "firebase_url": "https://digitalcare-d88ac.firebaseio.com",
+    "project_id": "digitalcare-d88ac",
+    "storage_bucket": "digitalcare-d88ac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:829950891711:android:f20d702496fbe8862cd80a",
+        "android_client_info": {
+          "package_name": "com.example.digitalcare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "829950891711-b0h5l2km1huedkk5u5ku2io1pb275s73.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.digitalcare",
+            "certificate_hash": "6e571be6c617a40c431047d63d678795b88e09b1"
+          }
+        },
+        {
+          "client_id": "829950891711-98a4hg5ia6nmilui4mpmmd4o0c2m01ti.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtd2ydarGYIuPvHEBqy4_OiFbg3Kqrqt4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "829950891711-98a4hg5ia6nmilui4mpmmd4o0c2m01ti.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
