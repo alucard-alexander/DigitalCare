@@ -28,8 +28,6 @@ public class Registration extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private FirebaseAuth mAuth;
     private String userID;
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,21 +44,25 @@ public class Registration extends AppCompatActivity {
     public void registerUser(View view) {
         progressDialog.setMessage("Registering");
         progressDialog.show();
-        mAuth.createUserWithEmailAndPassword(email.getText().toString(), pass.getText().toString())
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                            //uploadData();
-                            signIn();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Toast.makeText(Registration.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                            progressDialog.hide();
+        try {
+            mAuth.createUserWithEmailAndPassword(email.getText().toString(), pass.getText().toString())
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                //uploadData();
+                                signIn();
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Toast.makeText(Registration.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                progressDialog.hide();
+                            }
                         }
-                    }
-                });
+                    });
+        }catch (Exception e){
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
 

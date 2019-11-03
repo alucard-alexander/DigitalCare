@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,8 +24,11 @@ public class Login extends AppCompatActivity {
     private EditText email,pass;
     private ProgressDialog progressDialog;
     private FirebaseAuth mAuth;
+    private RadioGroup radioGroup;
+    private RadioButton radioButton1,radioButton2;
+    private String emailStr,passStr;
+    public TextView textView;
 
-    String emailStr,passStr;
 
 
     @Override
@@ -32,18 +38,24 @@ public class Login extends AppCompatActivity {
         email =  findViewById(R.id.editText7);
         pass = findViewById(R.id.editText9);
         progressDialog = new ProgressDialog(this);
+        radioGroup = findViewById(R.id.radioGroup);
+        radioButton1 = findViewById(R.id.radioButton);
+        radioButton2 = findViewById(R.id.radioButton2);
+        textView = findViewById(R.id.textView2);
         mAuth = FirebaseAuth.getInstance();
+        //mAuth.signOut();
         /*if (mAuth.getCurrentUser().getEmail() != null) {
             FirebaseUser user= mAuth.getCurrentUser();
             Toast.makeText(this, user.getEmail(), Toast.LENGTH_SHORT).show();
-
         }*/
-        if (mAuth.getUid() != null){
+        /*if (mAuth.getUid() != null){
             Intent i = new Intent(Login.this,Main2Activity.class);
             startActivity(i);
-        }
+        }*/
         Toast.makeText(this, mAuth.getUid(), Toast.LENGTH_SHORT).show();
     }
+
+
 
     public void loginUser(View view){
         progressDialog.setMessage("Trying to login");
@@ -51,8 +63,8 @@ public class Login extends AppCompatActivity {
         if (!email.getText().toString().isEmpty()){
             if (!pass.getText().toString().isEmpty()){
                 //Toast.makeText(this, "Working", Toast.LENGTH_SHORT).show();
-                /*SharedPreferences sharedPreferences = getSharedPreferences(MyConstants.sharedPreferencekey,MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();*/
+                //SharedPreferences sharedPreferences = getSharedPreferences(MyConstants.sharedPreferencekey,MODE_PRIVATE);
+                //SharedPreferences.Editor editor = sharedPreferences.edit();
                 //SaveSha
                 emailStr = email.getText().toString();
                 passStr = pass.getText().toString();
@@ -60,32 +72,22 @@ public class Login extends AppCompatActivity {
                         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
+                                Intent i;
                                 if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    //Log.d(TAG, "signInWithEmail:success");
-                                    /*FirebaseUser user = mAuth.getCurrentUser();
-                                    updateUI(user);*/
-                                    //Toast.makeText(Login.this, "Signed in", Toast.LENGTH_SHORT).show();
-
-                                    Intent i = new Intent(Login.this,Main2Activity.class);
-                                    startActivity(i);
                                     progressDialog.hide();
-                                    Toast.makeText(Login.this, "Success", Toast.LENGTH_SHORT).show();
-
+                                    if (radioButton1.isChecked()){
+                                        i = new Intent(Login.this,Main2Activity.class);
+                                    }else{
+                                        i = new Intent(Login.this, ChildHome.class);
+                                        //Toast.makeText(Login.this, "Child", Toast.LENGTH_SHORT).show();
+                                    }
+                                    startActivity(i);
                                 } else {
-                                    // If sign in fails, display a message to the user.
-                                    /*Log.w(TAG, "signInWithEmail:failure", task.getException());
-                                    Toast.makeText(EmailPasswordActivity.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-                                    updateUI(null);*/
                                     progressDialog.hide();
                                     Toast.makeText(Login.this, "Sign in failed, Try registered user Name and password", Toast.LENGTH_SHORT).show();
                                 }
-
-                                // ...
                             }
                         });
-
             }else {
                 Toast.makeText(this, "Please enter your password", Toast.LENGTH_SHORT).show();
             }
@@ -93,5 +95,10 @@ public class Login extends AppCompatActivity {
             Toast.makeText(this, "Please Enter registered email", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    public void registerPage(View view){
+        Intent i = new Intent(this,Registration.class);
+        startActivity(i);
     }
 }
