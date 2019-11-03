@@ -1,12 +1,16 @@
 package com.example.digitalcare;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.digitalcare.ConstantsFile.Constants;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import android.view.View;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -65,5 +69,14 @@ public class Main2Activity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Constants.PERMISSIONS_REQUEST_ENABLE_GPS){
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.nav_gallery);
+            fragment.onActivityResult(requestCode,resultCode,data);
+        }
     }
 }
