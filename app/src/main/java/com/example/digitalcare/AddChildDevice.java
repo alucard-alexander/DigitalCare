@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.digitalcare.ConstantsFile.Constants;
+
 public class AddChildDevice extends AppCompatActivity {
 
     private Uri imageUri = null;
@@ -32,21 +34,15 @@ public class AddChildDevice extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 9 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            selectImage();
-        } else {
-            Toast.makeText(this, "Read Permission should be granted inorder to upload File", Toast.LENGTH_SHORT).show();
-        }
-    }
+
+
+    //File choosing
 
     private void selectImage() {
         Intent intent = new Intent();
-        intent.setType("application/pdf");
+        intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, 86);
+        startActivityForResult(Intent.createChooser(intent,"Select Picture"), 86);
     }
 
     @Override
@@ -54,12 +50,45 @@ public class AddChildDevice extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 86 && resultCode == RESULT_OK && data != null) {
             imageUri = data.getData();
-            Toast.makeText(this, "File is choosen", Toast.LENGTH_SHORT).show();
-            //25 Min
+            Toast.makeText(this, imageUri.toString(), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Please select a File", Toast.LENGTH_SHORT).show();
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 9 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            selectImage();
+        } else if (requestCode == Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Read Permission should be granted inorder to upload File", Toast.LENGTH_SHORT).show();
+        }
+    }
+    //file choosing code ends here
+
+    //Granting permission
+
+    public void grantLocationGPSPermission(View view){
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            //locationPermissionGranted = true;
+            Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+    }
+
+
+
+
+    //Granting permission code ends here
+
 
 
 }
