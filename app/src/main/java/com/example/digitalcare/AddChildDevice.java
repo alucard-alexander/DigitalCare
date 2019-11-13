@@ -35,14 +35,13 @@ public class AddChildDevice extends AppCompatActivity {
     }
 
 
-
     //File choosing
 
     private void selectImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Select Picture"), 86);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), 86);
     }
 
     @Override
@@ -51,6 +50,8 @@ public class AddChildDevice extends AppCompatActivity {
         if (requestCode == 86 && resultCode == RESULT_OK && data != null) {
             imageUri = data.getData();
             Toast.makeText(this, imageUri.toString(), Toast.LENGTH_SHORT).show();
+        } else if (requestCode == Constants.PERMISSIONS_REQUEST_ENABLE_GPS) {
+
         } else {
             Toast.makeText(this, "Please select a File", Toast.LENGTH_SHORT).show();
         }
@@ -61,7 +62,9 @@ public class AddChildDevice extends AppCompatActivity {
         //super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 9 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             selectImage();
-        } else if (requestCode == Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        } else if (requestCode == Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivityForResult(enableGpsIntent, Constants.PERMISSIONS_REQUEST_ENABLE_GPS);
             Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Read Permission should be granted inorder to upload File", Toast.LENGTH_SHORT).show();
@@ -71,24 +74,47 @@ public class AddChildDevice extends AppCompatActivity {
 
     //Granting permission
 
-    public void grantLocationGPSPermission(View view){
+    public void grantLocationGPSPermission(View view) {
+
+
+        /*if (ActivityCompat.checkSelfPermission(this.getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED ) {
+            //mLocationPermissionGranted = true;
+            //getChatrooms();
+            Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivityForResult(enableGpsIntent, Constants.PERMISSIONS_REQUEST_ENABLE_GPS);
+            Toast.makeText(this, "permission granted", Toast.LENGTH_SHORT).show();
+
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION},
+                    Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+
+        }*/
+
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             //locationPermissionGranted = true;
-            Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        Constants.PERMISSIONS_REQUEST_ENABLE_GPS);
+            } else {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        Constants.PERMISSIONS_REQUEST_ENABLE_GPS);
+            }
+
+
         }
+
+
+        //Granting permission code ends here
+
+
     }
-
-
-
-
-    //Granting permission code ends here
-
-
-
 }
