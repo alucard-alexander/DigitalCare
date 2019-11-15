@@ -103,7 +103,7 @@ public class GalleryFragment extends Fragment implements OnMapReadyCallback {
 
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
+        builder.setMessage("This application requires GPS to work properly, enable it!!")
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
@@ -179,14 +179,11 @@ public class GalleryFragment extends Fragment implements OnMapReadyCallback {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        //Log.d(TAG, "onActivityResult: called.");
         switch (requestCode) {
             case Constants.PERMISSIONS_REQUEST_ENABLE_GPS: {
                     map123.setMyLocationEnabled(true);
             }
         }
-
-
     }
 
 
