@@ -8,5 +8,12 @@ public class Constants {
 
     public static final int SELECT_FILE_CODE = 86;
 
+    public static final String SHARED_PREFERENCE = "shredUsingThese";
+    public static final String TYPE = "type";
+    public static final String ID = "id";
+    public static final String CHILD_ID = "childID";
+
+    public static final int PLACE_PICKER_REQUEST = 1;
+
 
 }
