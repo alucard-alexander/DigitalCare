@@ -162,118 +162,125 @@ public class AddChildDevice extends AppCompatActivity {
 
 
     public void saveData(View view) {
-        EditText ed5 = findViewById(R.id.editText5);
-        if (ed5.getText().toString() == null) {
-            Toast.makeText(this, "Please enter child's name", Toast.LENGTH_SHORT).show();
-        } else if (!gpsEnabled) {
-            Toast.makeText(this, "Please enable GPS", Toast.LENGTH_SHORT).show();
-        } else if (imageUri == null) {
-            Toast.makeText(this, "Please select profile image and enable ", Toast.LENGTH_SHORT).show();
-        } else {
-            try {
-                progressDialog = new ProgressDialog(this);
-                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                progressDialog.setTitle("Updating Profile...Plz be patience");
-                progressDialog.setProgress(0);
-                progressDialog.show();
+        try {
+            EditText ed5 = findViewById(R.id.editText5);
+            if (ed5.getText().toString() == null) {
+                Toast.makeText(this, "Please enter child's name", Toast.LENGTH_SHORT).show();
+            } else if (!gpsEnabled) {
+                Toast.makeText(this, "Please enable GPS", Toast.LENGTH_SHORT).show();
+            } else if (imageUri == null) {
+                Toast.makeText(this, "Please select profile image and enable ", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    progressDialog = new ProgressDialog(this);
+                    progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                    progressDialog.setTitle("Updating Profile...Plz be patience");
+                    progressDialog.setProgress(0);
+                    progressDialog.show();
 
-                progressDialog.setCancelable(false);
+                    progressDialog.setCancelable(false);
 
-                fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful()) {
-                            Location location = task.getResult();
+                    fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Location> task) {
+                            if (task.isSuccessful()) {
+                                Location location = task.getResult();
 
-                            Log.d("latt", String.valueOf(location.getLatitude()));
-                            //Log.d("latt", String.valueOf(geoPoint.getLatitude()));
-                            geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                            progressDialog.setProgress(10);
+                                Log.d("latt", String.valueOf(location.getLatitude()));
+                                //Log.d("latt", String.valueOf(geoPoint.getLatitude()));
+                                geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                                progressDialog.setProgress(10);
+                            }
                         }
-                    }
-                });
+                    });
 
-                //firestore
+                    //firestore
 
-                ChildDetails childUserVar = new ChildDetails(ed5.getText().toString(), mAuth.getUid(), geoPoint);
-                db.collection("child")
-                        .add(childUserVar)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                //Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                                //Toast.makeText(AddChildDevice.this, documentReference.getId(), Toast.LENGTH_SHORT).show();
-                                progressDialog.setProgress(50);
-                                final String documentID = documentReference.getId();
-                                Uri file = imageUri;
-                                String arg = "childDp/" + documentReference.getId() + ".jpg";
-                                final StorageReference riversRef = mStorageRef.child(arg);
-                                riversRef.putFile(file)
-                                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                            @Override
-                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                // Get a URL to the uploaded content
-                                                // taskSnapshot.getMetadata().getReference().getDownloadUrl()
-                                                progressDialog.setProgress(70);
-                                                Task<Uri> downloadUrl1 = taskSnapshot.getMetadata().getReference().getDownloadUrl();
-                                                downloadUrl1.addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                                    @Override
-                                                    public void onSuccess(Uri uri) {
-                                                        progressDialog.setProgress(90);
-                                                        Toast.makeText(AddChildDevice.this, uri.toString(), Toast.LENGTH_SHORT).show();
-                                                        Map<String, Object> data = new HashMap<>();
-                                                        data.put("dpDownloadUrl", uri.toString());
-                                                        progressDialog.setProgress(95);
-                                                        db.collection("child").document(documentID)
-                                                                .set(data, SetOptions.merge())
-                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                    @Override
-                                                                    public void onSuccess(Void aVoid) {
-                                                                        //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                                                                        progressDialog.hide();
-                                                                        Toast.makeText(AddChildDevice.this, "Success", Toast.LENGTH_SHORT).show();
+                    ChildDetails childUserVar = new ChildDetails(ed5.getText().toString(), mAuth.getUid(), geoPoint);
+                    db.collection("child")
+                            .add(childUserVar)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    //Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                                    //Toast.makeText(AddChildDevice.this, documentReference.getId(), Toast.LENGTH_SHORT).show();
+                                    progressDialog.setProgress(50);
+                                    final String documentID = documentReference.getId();
+                                    Uri file = imageUri;
+                                    String arg = "childDp/" + documentReference.getId() + ".jpg";
+                                    final StorageReference riversRef = mStorageRef.child(arg);
+                                    riversRef.putFile(file)
+                                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                @Override
+                                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                    // Get a URL to the uploaded content
+                                                    // taskSnapshot.getMetadata().getReference().getDownloadUrl()
+                                                    progressDialog.setProgress(70);
+                                                    Task<Uri> downloadUrl1 = taskSnapshot.getMetadata().getReference().getDownloadUrl();
+                                                    downloadUrl1.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                        @Override
+                                                        public void onSuccess(Uri uri) {
+                                                            progressDialog.setProgress(90);
+                                                            Toast.makeText(AddChildDevice.this, uri.toString(), Toast.LENGTH_SHORT).show();
+                                                            Map<String, Object> data = new HashMap<>();
+                                                            data.put("dpDownloadUrl", uri.toString());
+                                                            progressDialog.setProgress(95);
+                                                            db.collection("child").document(documentID)
+                                                                    .set(data, SetOptions.merge())
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                                                                            progressDialog.hide();
+                                                                            Toast.makeText(AddChildDevice.this, "Success heeerrreeeeeeeeeee", Toast.LENGTH_SHORT).show();
 
-                                                                        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE,MODE_PRIVATE);
-                                                                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                                                                        editor.putString(Constants.TYPE,"CHILD");
-                                                                        //editor.putString(Constants.ID,mAuth.getUid());
-                                                                        editor.putString(Constants.CHILD_ID,documentID);
+                                                                            SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
+                                                                            SharedPreferences.Editor editor = sharedPreferences.edit();
 
-                                                                        Intent i = new Intent(AddChildDevice.this, MapsActivity.class);
-                                                                        startActivity(i);
-                                                                    }
-                                                                })
-                                                                .addOnFailureListener(new OnFailureListener() {
-                                                                    @Override
-                                                                    public void onFailure(@NonNull Exception e) {
-                                                                        progressDialog.hide();
-                                                                        Toast.makeText(AddChildDevice.this, "An error occured check your internet connection", Toast.LENGTH_SHORT).show();
-                                                                    }
-                                                                });
 
-                                                    }
-                                                });
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception exception) {
-                                                progressDialog.hide();
-                                                Toast.makeText(AddChildDevice.this, "An error occured check your internet connection", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                progressDialog.hide();
-                                Toast.makeText(AddChildDevice.this, "An error occured check your internet connection", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            } catch (Exception e) {
-                Log.d("errorrrrr", e.getMessage());
+
+                                                                            editor.putString(Constants.TYPE, "CHILD");
+                                                                            //editor.putString(Constants.ID,mAuth.getUid());
+                                                                            editor.putString(Constants.CHILD_ID, documentID);
+                                                                            editor.apply();
+                                                                            Intent i = new Intent(AddChildDevice.this, MapsActivity.class);
+                                                                            startActivity(i);
+                                                                        }
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            progressDialog.hide();
+                                                                            Toast.makeText(AddChildDevice.this, "An error occured check your internet connection", Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    });
+
+                                                        }
+                                                    });
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception exception) {
+                                                    progressDialog.hide();
+                                                    Toast.makeText(AddChildDevice.this, "An error occured check your internet connection", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    progressDialog.hide();
+                                    Toast.makeText(AddChildDevice.this, "An error occured check your internet connection", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                } catch (Exception e) {
+                    Log.d("errorrrrr", e.getMessage());
+                }
             }
+        } catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -283,7 +290,6 @@ public class AddChildDevice extends AppCompatActivity {
         imageUri = null;
         Toast.makeText(this, "Image and name has been reset", Toast.LENGTH_SHORT).show();
     }
-
 
 
 }

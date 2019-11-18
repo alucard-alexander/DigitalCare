@@ -1,45 +1,57 @@
 package com.example.digitalcare;
 
-import androidx.annotation.Nullable;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
+
 import android.content.DialogInterface;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.example.digitalcare.Bean.MarkerDetails;
+import com.example.digitalcare.ConstantsFile.Constants;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.SetOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback{
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private EditText editText;
     private String searchString;
-    private ProgressDialog progressDialog;
+
     private LatLng latLng;
     private ArrayList<MarkerDetails> mark = new ArrayList<>();
+
 
 
 
@@ -55,7 +67,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         editText = findViewById(R.id.input_search);
 
-        progressDialog = new ProgressDialog(this);
+
+
+        Toast.makeText(this, "Workinggggg", Toast.LENGTH_SHORT).show();
     }
 
     private void init() {
@@ -69,9 +83,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         || event.getAction() == KeyEvent.ACTION_DOWN
                         || event.getAction() == KeyEvent.KEYCODE_ENTER
                 ) {
-                    progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                    progressDialog.setTitle("Loading...");
                     Toast.makeText(MapsActivity.this, "Here", Toast.LENGTH_SHORT).show();
+
+
                     geoLocate();
                 }
                 return false;
@@ -82,15 +96,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private void moveCameraSetMarker(LatLng latLng,String name){
+    private void moveCameraSetMarker(LatLng latLng, String name) {
         mMap.addMarker(new MarkerOptions().position(latLng).title(name));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        String thi= String.valueOf(mark.size());
+        String thi = String.valueOf(mark.size());
         Toast.makeText(this, thi, Toast.LENGTH_SHORT).show();
     }
 
     private void geoLocate() {
-        int i =0;
+
         searchString = editText.getText().toString();
 
         Geocoder geocoder = new Geocoder(this);
@@ -107,7 +121,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             final Address address = list.get(0);
 
             Log.d("addressss", "address: " + address.toString());
-            latLng = new LatLng(address.getLatitude(),address.getLongitude());
+            latLng = new LatLng(address.getLatitude(), address.getLongitude());
             /*childareaname childareaname1 = new childareaname();
             childareaname1.show(getSupportFragmentManager(),"Area name");*/
 
@@ -133,20 +147,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             mark.add(md);
                             moveCameraSetMarker(latLng, txt);
 
-                        }else {
+
+                        } else {
                             Toast.makeText(MapsActivity.this, "Enter the place name", Toast.LENGTH_SHORT).show();
-                            geoLocate();
+//                            geoLocate();
                         }
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         Toast.makeText(MapsActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
 
                 }
             });
 
-
-            AlertDialog ad = builder.create();
-            ad.show();
+            builder.create().show();
+            /*AlertDialog ad = builder.create();
+            ad.show();*/
 
             //builder.show();
 
@@ -184,10 +199,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         init();
     }
 
+    public void addMarker(View view){
+        Toast.makeText(this, "Here will work", Toast.LENGTH_SHORT).show();
 
-    /*@Override
-    public void getTextString(String name) {
-        moveCameraSetMarker(latLng,name);
 
-    }*/
+        try {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
+            String childID = sharedPreferences.getString(Constants.CHILD_ID, "");
+
+            for (MarkerDetails m : mark) {
+
+                Map<String, Object> user = new HashMap<>();
+                user.put(m.getName(),m.getGeoPoint());
+
+                db.collection("Allowed_Markers")
+                        //.document("SGPQaeVX0A8732GNzZGh")
+                        .document(childID)
+                        .set(user, SetOptions.merge())
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(MapsActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                //Log.w(TAG, "Error adding document", e);
+                                Toast.makeText(MapsActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+            Intent i = new Intent(this,LockedScreenSignOut.class);
+            startActivity(i);
+        }catch (Exception e){
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
 }
