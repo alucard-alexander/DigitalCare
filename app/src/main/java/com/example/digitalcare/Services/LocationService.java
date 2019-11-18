@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 
@@ -17,21 +18,29 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
 
+import com.example.digitalcare.ConstantsFile.Constants;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -77,11 +86,57 @@ public class LocationService extends Service {
         return START_NOT_STICKY;
     }
 
+    private LocationRequest mLocationRequestHighAccuracy;
+    private LocationCallback locationCallback;
+
     private void getLocation() {
 
         // ---------------------------------- LocationRequest ------------------------------------
         // Create the location request to start receiving updates
-        LocationRequest mLocationRequestHighAccuracy = new LocationRequest();
+        locationCallback = new LocationCallback(){
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+
+                Log.d(TAG, "onLocationResult: got location result.");
+
+                Location location = locationResult.getLastLocation();
+
+                if (location != null) {
+                            /*User user = ((UserClient)(getApplicationContext())).getUser();
+                            GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                            UserLocation userLocation = new UserLocation(user, geoPoint, null);
+                            saveUserLocation(userLocation);*/
+
+                    Map<String, Object> data = new HashMap<>();
+                    //data.put("dpDownloadUrl", uri.toString());
+                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                    data.put("geoPoint",geoPoint);
+
+                    SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
+                    String childID = sharedPreferences.getString(Constants.CHILD_ID, "");
+
+                    FirebaseFirestore db= FirebaseFirestore.getInstance();
+                    db.collection("child").document(childID)
+                            .set(data, SetOptions.merge())
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(LocationService.this, "Success", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(LocationService.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                    String str1 = String.valueOf(location.getLatitude()) +" " + String.valueOf(location.getLongitude());
+                    Toast.makeText(LocationService.this, str1, Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+        mLocationRequestHighAccuracy = new LocationRequest();
         mLocationRequestHighAccuracy.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequestHighAccuracy.setInterval(UPDATE_INTERVAL);
         mLocationRequestHighAccuracy.setFastestInterval(FASTEST_INTERVAL);
@@ -95,24 +150,7 @@ public class LocationService extends Service {
             return;
         }
         Log.d(TAG, "getLocation: getting location information.");
-        mFusedLocationClient.requestLocationUpdates(mLocationRequestHighAccuracy, new LocationCallback() {
-                    @Override
-                    public void onLocationResult(LocationResult locationResult) {
-
-                        Log.d(TAG, "onLocationResult: got location result.");
-
-                        Location location = locationResult.getLastLocation();
-
-                        if (location != null) {
-                            /*User user = ((UserClient)(getApplicationContext())).getUser();
-                            GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                            UserLocation userLocation = new UserLocation(user, geoPoint, null);
-                            saveUserLocation(userLocation);*/
-                            String str1 = String.valueOf(location.getLatitude()) +" " + String.valueOf(location.getLongitude());
-                            Toast.makeText(LocationService.this, str1, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                },
+        mFusedLocationClient.requestLocationUpdates(mLocationRequestHighAccuracy, locationCallback,
                 Looper.myLooper()); // Looper.myLooper tells this to repeat forever until thread is destroyed
     }
 
@@ -146,6 +184,9 @@ public class LocationService extends Service {
         super.onDestroy();
         //timer.cancel();
         //task.cancel();
+        //stopSelf();
+        //mFusedLocationClient.removeLocationUpdates(mLocationRequestHighAccuracy);
+        mFusedLocationClient.removeLocationUpdates(locationCallback);
         Log.i("stopped", "onCreate() , service stopped...");
     }
 

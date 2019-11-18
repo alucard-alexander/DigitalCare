@@ -7,6 +7,7 @@ import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,6 +15,7 @@ import com.example.digitalcare.ConstantsFile.Constants;
 import com.example.digitalcare.Services.LocationService;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -22,12 +24,21 @@ public class LockedScreenSignOut extends AppCompatActivity {
 
     private Intent serviceIntent;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locked_screen_sign_out);
-
         startLocationService();
+
+        /*SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE,MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Constants.TYPE,"");
+        editor.putString(Constants.CHILD_ID,"");
+        editor.apply();
+
+        Intent i = new Intent(this,Login.class);
+        startActivity(i);*/
 
     }
 
@@ -46,10 +57,11 @@ public class LockedScreenSignOut extends AppCompatActivity {
         }
     }
 
+
     private boolean isLocationServiceRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if ("com.example.digitalCare.Services.LocationService".equals(service.service.getClassName())) {
+            if ("com.example.digitalcare.Services.LocationService".equals(service.service.getClassName())) {
                 //Log.d(TAG, "isLocationServiceRunning: location service is already running.");
                 return true;
             }
@@ -61,13 +73,17 @@ public class LockedScreenSignOut extends AppCompatActivity {
 
     public void signout(View view) {
 
-        if (!isLocationServiceRunning()) {
+        if (isLocationServiceRunning()) {
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 
-                LockedScreenSignOut.this.stopService(serviceIntent);
+                //LockedScreenSignOut.this.stopService(serviceIntent);
+                getApplicationContext().stopService(serviceIntent);
+
             } else {
-                startService(serviceIntent);
+
+                getApplicationContext().stopService(serviceIntent);
+                //stopService(serviceIntent);
             }
 
 
@@ -75,8 +91,7 @@ public class LockedScreenSignOut extends AppCompatActivity {
         }
 
 
-        /*
-        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE,MODE_PRIVATE);
+        /*SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE,MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -112,7 +127,8 @@ public class LockedScreenSignOut extends AppCompatActivity {
                     }
                 });
 
-       /* StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
         String name = "childDP/"+childID+".jpg";
         StorageReference desertRef = storageRef.child(name);
 
@@ -130,11 +146,16 @@ public class LockedScreenSignOut extends AppCompatActivity {
                     }
                 });
 
+        //StorageReference photoRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://digitalcare-d88ac.appspot.com/childDp/ZVnwAljAjCrJ27BM1IRn.jpg");
+
         Toast.makeText(this, "Successfully deleted", Toast.LENGTH_SHORT).show();
 
         editor.putString(Constants.TYPE,"");
         editor.putString(Constants.CHILD_ID,"");
         editor.apply();
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();;
+        mAuth.signOut();
 
         Intent i = new Intent(this,Login.class);
         startActivity(i);
