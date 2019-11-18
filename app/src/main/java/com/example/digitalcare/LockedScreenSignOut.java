@@ -3,6 +3,7 @@ package com.example.digitalcare;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.digitalcare.ConstantsFile.Constants;
+import com.example.digitalcare.Services.LocationService;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -18,14 +20,62 @@ import com.google.firebase.storage.StorageReference;
 
 public class LockedScreenSignOut extends AppCompatActivity {
 
+    private Intent serviceIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locked_screen_sign_out);
+
+        startLocationService();
+
     }
 
-    public void signout(View view){
 
+    private void startLocationService() {
+        if (!isLocationServiceRunning()) {
+            serviceIntent  = new Intent(this, LocationService.class);
+//        this.startService(serviceIntent);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
+                LockedScreenSignOut.this.startForegroundService(serviceIntent);
+            } else {
+                startService(serviceIntent);
+            }
+        }
+    }
+
+    private boolean isLocationServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if ("com.example.digitalCare.Services.LocationService".equals(service.service.getClassName())) {
+                //Log.d(TAG, "isLocationServiceRunning: location service is already running.");
+                return true;
+            }
+        }
+        //Log.d(TAG, "isLocationServiceRunning: location service is not running.");
+        return false;
+    }
+
+
+    public void signout(View view) {
+
+        if (!isLocationServiceRunning()) {
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
+                LockedScreenSignOut.this.stopService(serviceIntent);
+            } else {
+                startService(serviceIntent);
+            }
+
+
+
+        }
+
+
+        /*
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE,MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -61,9 +111,8 @@ public class LockedScreenSignOut extends AppCompatActivity {
 
                     }
                 });
-        /*StorageReference storage;
-        storage = FirebaseStorage.getInstance().getReference();*/
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+
+       /* StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         String name = "childDP/"+childID+".jpg";
         StorageReference desertRef = storageRef.child(name);
 
@@ -89,6 +138,8 @@ public class LockedScreenSignOut extends AppCompatActivity {
 
         Intent i = new Intent(this,Login.class);
         startActivity(i);
+
+        */
     }
 
 }
