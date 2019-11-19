@@ -49,7 +49,7 @@ public class LocationService extends Service {
     private static final String TAG = "LocationService";
 
     private FusedLocationProviderClient mFusedLocationClient;
-    private final static long UPDATE_INTERVAL = 4 * 1000;  /* 4 secs */
+    private final static long UPDATE_INTERVAL = 400 * 1000;  /* 4 secs */
     private final static long FASTEST_INTERVAL = 2000; /* 2 sec */
 
     @Nullable
@@ -90,68 +90,75 @@ public class LocationService extends Service {
     private LocationCallback locationCallback;
 
     private void getLocation() {
+        try {
 
-        // ---------------------------------- LocationRequest ------------------------------------
-        // Create the location request to start receiving updates
-        locationCallback = new LocationCallback(){
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
+            // ---------------------------------- LocationRequest ------------------------------------
+            // Create the location request to start receiving updates
+            locationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
 
-                Log.d(TAG, "onLocationResult: got location result.");
+                    Log.d(TAG, "onLocationResult: got location result.");
 
-                Location location = locationResult.getLastLocation();
+                    Location location = locationResult.getLastLocation();
 
-                if (location != null) {
+                    if (location != null) {
                             /*User user = ((UserClient)(getApplicationContext())).getUser();
                             GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
                             UserLocation userLocation = new UserLocation(user, geoPoint, null);
                             saveUserLocation(userLocation);*/
 
-                    Map<String, Object> data = new HashMap<>();
-                    //data.put("dpDownloadUrl", uri.toString());
-                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                    data.put("geoPoint",geoPoint);
+                        Map<String, Object> data = new HashMap<>();
+                        //data.put("dpDownloadUrl", uri.toString());
+                        GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                        data.put("geoPoint", geoPoint);
 
-                    SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
-                    String childID = sharedPreferences.getString(Constants.CHILD_ID, "");
+                        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
+                        String childID = sharedPreferences.getString(Constants.CHILD_ID, "");
 
-                    FirebaseFirestore db= FirebaseFirestore.getInstance();
-                    db.collection("child").document(childID)
-                            .set(data, SetOptions.merge())
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Toast.makeText(LocationService.this, "Success", Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(LocationService.this, "Something went wrong", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        db.collection("child").document(childID)
+                                .set(data, SetOptions.merge())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(LocationService.this, "Success", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(LocationService.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
 
-                    String str1 = String.valueOf(location.getLatitude()) +" " + String.valueOf(location.getLongitude());
-                    Toast.makeText(LocationService.this, str1, Toast.LENGTH_SHORT).show();
+                        String str1 = String.valueOf(location.getLatitude()) + " " + String.valueOf(location.getLongitude());
+                        Toast.makeText(LocationService.this, str1, Toast.LENGTH_SHORT).show();
+                    }
                 }
+            };
+
+            mLocationRequestHighAccuracy = new LocationRequest();
+            mLocationRequestHighAccuracy.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            mLocationRequestHighAccuracy.setInterval(UPDATE_INTERVAL);
+            mLocationRequestHighAccuracy.setFastestInterval(FASTEST_INTERVAL);
+
+
+            // new Google API SDK v11 uses getFusedLocationProviderClient(this)
+            if (ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "getLocation: stopping the location service.");
+                stopSelf();
+                return;
             }
-        };
-        mLocationRequestHighAccuracy = new LocationRequest();
-        mLocationRequestHighAccuracy.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequestHighAccuracy.setInterval(UPDATE_INTERVAL);
-        mLocationRequestHighAccuracy.setFastestInterval(FASTEST_INTERVAL);
+            Log.d(TAG, "getLocation: getting location information.");
+            mFusedLocationClient.requestLocationUpdates(mLocationRequestHighAccuracy, locationCallback,
+                    Looper.myLooper()); // Looper.myLooper tells this to repeat forever until thread is destroyed
 
-
-        // new Google API SDK v11 uses getFusedLocationProviderClient(this)
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "getLocation: stopping the location service.");
-            stopSelf();
-            return;
+        } catch (Exception e) {
+            Log.d("got", "getLocation: ");
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
-        Log.d(TAG, "getLocation: getting location information.");
-        mFusedLocationClient.requestLocationUpdates(mLocationRequestHighAccuracy, locationCallback,
-                Looper.myLooper()); // Looper.myLooper tells this to repeat forever until thread is destroyed
     }
 
     /*private void saveUserLocation(final UserLocation userLocation){
@@ -189,8 +196,6 @@ public class LocationService extends Service {
         mFusedLocationClient.removeLocationUpdates(locationCallback);
         Log.i("stopped", "onCreate() , service stopped...");
     }
-
-
 
 
 }

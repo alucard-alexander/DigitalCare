@@ -91,7 +91,7 @@ public class LockedScreenSignOut extends AppCompatActivity {
         }
 
 
-        /*SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE,MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE,MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -160,7 +160,7 @@ public class LockedScreenSignOut extends AppCompatActivity {
         Intent i = new Intent(this,Login.class);
         startActivity(i);
 
-        */
+
     }
 
 }

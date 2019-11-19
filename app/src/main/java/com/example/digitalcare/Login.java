@@ -57,9 +57,13 @@ public class Login extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
         String type = sharedPreferences.getString(Constants.TYPE, "");
         String childID = sharedPreferences.getString(Constants.CHILD_ID, "");
+
         Toast.makeText(this, type, Toast.LENGTH_SHORT).show();
-        if (type.equals("CHILD") && !childID.equals("")) {
+        if (type.equals("CHILD") && !childID.equals("") && mAuth != null) {
             Intent i = new Intent(this, LockedScreenSignOut.class);
+            startActivity(i);
+        } else if (type.equals("PARENT") && mAuth.getUid() != null ) {
+            Intent i = new Intent(this, Main2Activity.class);
             startActivity(i);
         }
 
@@ -87,11 +91,26 @@ public class Login extends AppCompatActivity {
                                     progressDialog.hide();
                                     if (radioButton1.isChecked()) {
                                         i = new Intent(Login.this, Main2Activity.class);
-                                    } else {
+                                        progressDialog.hide();
+                                        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+
+                                        editor.putString(Constants.TYPE, "PARENT");
+                                        //editor.putString(Constants.ID,mAuth.getUid());
+
+                                        editor.apply();
+                                        startActivity(i);
+                                    } else if (radioButton2.isChecked()) {
                                         i = new Intent(Login.this, ChildHome.class);
+                                        progressDialog.hide();
+                                        startActivity(i);
                                         //Toast.makeText(Login.this, "Child", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        progressDialog.hide();
+                                        Toast.makeText(Login.this, "Please select Type", Toast.LENGTH_SHORT).show();
                                     }
-                                    startActivity(i);
+
                                 } else {
                                     progressDialog.hide();
                                     Toast.makeText(Login.this, "Sign in failed, Try registered user Name and password", Toast.LENGTH_SHORT).show();
