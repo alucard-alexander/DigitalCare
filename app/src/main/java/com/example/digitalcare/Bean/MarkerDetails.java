@@ -11,6 +11,11 @@ public class MarkerDetails {
         this.geoPoint = geoPoint;
     }
 
+    public MarkerDetails(GeoPoint point){
+        this.geoPoint = point;
+    }
+
+
     public String getName() {
         return name;
     }

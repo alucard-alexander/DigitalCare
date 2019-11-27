@@ -221,7 +221,7 @@ public class AddChildDevice extends AppCompatActivity {
                                                         @Override
                                                         public void onSuccess(Uri uri) {
                                                             progressDialog.setProgress(90);
-                                                            Toast.makeText(AddChildDevice.this, uri.toString(), Toast.LENGTH_SHORT).show();
+                                                            //Toast.makeText(AddChildDevice.this, uri.toString(), Toast.LENGTH_SHORT).show();
                                                             Map<String, Object> data = new HashMap<>();
                                                             data.put("dpDownloadUrl", uri.toString());
                                                             progressDialog.setProgress(95);

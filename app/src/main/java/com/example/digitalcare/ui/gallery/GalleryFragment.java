@@ -32,6 +32,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.digitalcare.Bean.MarkerDetails;
 import com.example.digitalcare.ConstantsFile.Constants;
 import com.example.digitalcare.Main2Activity;
 import com.example.digitalcare.R;
@@ -64,6 +65,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.validation.Validator;
@@ -74,7 +76,8 @@ public class GalleryFragment extends Fragment implements OnMapReadyCallback {
     GoogleMap map123;
     private Boolean locationPermissionGranted = false;
     private FirebaseFirestore db;
-    private int i;
+    //private List<MarkerDetails> marker123 = new ArrayList<>();
+    //private  int i=0;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -118,9 +121,7 @@ public class GalleryFragment extends Fragment implements OnMapReadyCallback {
 
                                 @Override
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
                                     Bitmap bitmap1;
-
                                     if (task.isSuccessful()) {
                                         if (task.getResult().isEmpty()) {
                                             //Toast.makeText(MainActivity.this, "Empty", Toast.LENGTH_SHORT).show();
@@ -145,7 +146,7 @@ public class GalleryFragment extends Fragment implements OnMapReadyCallback {
                                                             .fitCenter()
                                                             .into(new SimpleTarget<Bitmap>() {
 
-                                                                int scaleSize =350;
+                                                                int scaleSize = 350;
 
                                                                 public Bitmap resizeImageForImageView(Bitmap bitmap) {
                                                                     Bitmap resizedBitmap = null;
@@ -154,17 +155,17 @@ public class GalleryFragment extends Fragment implements OnMapReadyCallback {
                                                                     int newWidth = -1;
                                                                     int newHeight = -1;
                                                                     float multFactor = -1.0F;
-                                                                    if(originalHeight > originalWidth) {
-                                                                        newHeight = scaleSize ;
-                                                                        multFactor = (float) originalWidth/(float) originalHeight;
-                                                                        newWidth = (int) (newHeight*multFactor);
-                                                                    } else if(originalWidth > originalHeight) {
-                                                                        newWidth = scaleSize ;
-                                                                        multFactor = (float) originalHeight/ (float)originalWidth;
-                                                                        newHeight = (int) (newWidth*multFactor);
-                                                                    } else if(originalHeight == originalWidth) {
-                                                                        newHeight = scaleSize ;
-                                                                        newWidth = scaleSize ;
+                                                                    if (originalHeight > originalWidth) {
+                                                                        newHeight = scaleSize;
+                                                                        multFactor = (float) originalWidth / (float) originalHeight;
+                                                                        newWidth = (int) (newHeight * multFactor);
+                                                                    } else if (originalWidth > originalHeight) {
+                                                                        newWidth = scaleSize;
+                                                                        multFactor = (float) originalHeight / (float) originalWidth;
+                                                                        newHeight = (int) (newWidth * multFactor);
+                                                                    } else if (originalHeight == originalWidth) {
+                                                                        newHeight = scaleSize;
+                                                                        newWidth = scaleSize;
                                                                     }
                                                                     resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false);
                                                                     return resizedBitmap;
@@ -178,13 +179,12 @@ public class GalleryFragment extends Fragment implements OnMapReadyCallback {
                                                                     resource = resizeImageForImageView(resource);
 
                                                                     mMap.addMarker(new MarkerOptions().position(latLng).title(document1.getString("name"))
-                                                                        .icon(BitmapDescriptorFactory.fromBitmap(resource))
+                                                                            .icon(BitmapDescriptorFactory.fromBitmap(resource))
                                                                     );
                                                                 }
                                                             });
 
                                                     //View mCustomMarkerView = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.view_custom_marker, null);
-
 
 
                                                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
@@ -201,56 +201,43 @@ public class GalleryFragment extends Fragment implements OnMapReadyCallback {
                                                             .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                                 @Override
                                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                                    if (task.isSuccessful()){
+                                                                    if (task.isSuccessful()) {
                                                                         DocumentSnapshot documentSnapshot = task.getResult();
-                                                                        Map<String,Object> map  = documentSnapshot.getData();
+                                                                        Map<String, Object> map = documentSnapshot.getData();
 
                                                                         for (Map.Entry<String, Object> entry : map.entrySet()) {
                                                                             //mMap.addMarker(new MarkerOptions().position())
                                                                             GeoPoint geoPoint = (GeoPoint) entry.getValue();
-                                                                            LatLng latLng = new LatLng(geoPoint.getLatitude(),geoPoint.getLongitude());
+                                                                            LatLng latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
                                                                             String name = entry.getKey();
                                                                             mMap.addMarker(new MarkerOptions().position(latLng).title(name).draggable(false)
-                                                                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                                                                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                                                                             );
+                                                                            Log.d("start", "HERE");
+                                                                            // marker123.add(new MarkerDetails(geoPoint));
+                                                                            //i=1;
+                                                                            Log.d("end", "ENNDDD");
                                                                             Circle circle = mMap.addCircle(new CircleOptions()
-                                                                            .center(latLng)
-                                                                                    .radius(10000)
+                                                                                    .center(latLng)
+                                                                                    .radius(3000)
                                                                                     .strokeColor(Color.RED)
                                                                                     .fillColor(0x220000FF)
-                                                                                            .strokeWidth(5)
+                                                                                    .strokeWidth(5)
 
                                                                             );
+                                                                            //Log.d("sssiiiiiiizzzeeee", String.valueOf(marker123.size()));
                                                                             //Log.d("lllllllllllll", String.valueOf(geoPoint.getLatitude()));
                                                                         }
                                                                     }
                                                                 }
                                                             });
-
-                                                }catch (Exception e){
+                                                    //Toast.makeText(getContext(), String.valueOf(marker123.get(0).getGeoPoint().getLatitude()), Toast.LENGTH_SHORT).show();
+                                                    //Log.d("vaaaaaa", String.valueOf(marker123.get(0).getGeoPoint().getLatitude()));
+                                                    //Toast.makeText(getContext(), String.valueOf(marker123.size()), Toast.LENGTH_SHORT).show();
+                                                    //Toast.makeText(getContext(), String.valueOf(i), Toast.LENGTH_SHORT).show();
+                                                } catch (Exception e) {
                                                     Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                                 }
-
-
-
-
-
-
-                                                /*db.collection("Allowed_Markers")
-                                                        .document(document.getId())
-                                                        .get()
-                                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task1) {
-                                                                if (task1.getResult() == null) {
-                                                                    //Toast.makeText(MainActivity.this, "Empty", Toast.LENGTH_SHORT).show();
-                                                                    Toast.makeText(getContext(), "No Markers Added for this user", Toast.LENGTH_SHORT).show();
-                                                                } else {
-                                                                    for (QueryDocumentSnapshot document : task1.getResult()) {
-
-                                                                    }
-                                                            }
-                                                        });*/
 
                                             }
                                         }
