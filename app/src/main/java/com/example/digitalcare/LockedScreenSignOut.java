@@ -62,7 +62,6 @@ public class LockedScreenSignOut extends AppCompatActivity {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if ("com.example.digitalcare.Services.LocationService".equals(service.service.getClassName())) {
-                //Log.d(TAG, "isLocationServiceRunning: location service is already running.");
                 return true;
             }
         }

@@ -37,6 +37,7 @@ import com.example.digitalcare.ConstantsFile.Constants;
 import com.example.digitalcare.Main2Activity;
 import com.example.digitalcare.R;
 
+import com.example.digitalcare.Services.LocationService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -81,6 +82,9 @@ public class GalleryFragment extends Fragment implements OnMapReadyCallback {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
+
+
         galleryViewModel =
                 ViewModelProviders.of(this).get(GalleryViewModel.class);
         View root = inflater.inflate(R.layout.fragment_gallery, container, false);

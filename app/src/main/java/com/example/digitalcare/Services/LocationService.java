@@ -23,6 +23,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
 
+import com.example.digitalcare.CheckForLocationUpdates;
 import com.example.digitalcare.ConstantsFile.Constants;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -35,8 +36,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
@@ -49,8 +53,11 @@ public class LocationService extends Service {
     private static final String TAG = "LocationService";
 
     private FusedLocationProviderClient mFusedLocationClient;
-    private final static long UPDATE_INTERVAL = 400 * 1000;  /* 4 secs */
+    private final static long UPDATE_INTERVAL = 4 * 1000;  /* 4 secs */
     private final static long FASTEST_INTERVAL = 2000; /* 2 sec */
+
+    private LocationRequest mLocationRequestHighAccuracy;
+    private LocationCallback locationCallback;
 
     @Nullable
     @Override
@@ -82,12 +89,69 @@ public class LocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand: called.");
-        getLocation();
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
+        if (sharedPreferences.getString(Constants.TYPE, null).equals("PARENT"))
+            getChildLocation();
+        else
+            getLocation();
         return START_NOT_STICKY;
     }
 
-    private LocationRequest mLocationRequestHighAccuracy;
-    private LocationCallback locationCallback;
+    private void getChildLocation() {
+        //run();
+        //Looper.myLooper();
+
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("child")
+                .whereEqualTo("p_id", FirebaseAuth.getInstance().getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (final QueryDocumentSnapshot document1 : task.getResult()) {
+                                //Log.d(TAG, document.getId() + " => " + document.getData());
+                                //Log.d("IIDDDD", document.getId());
+                                final QueryDocumentSnapshot documentInside = document1;
+                                db.collection("Allowed_Markers")
+                                        .document(document1.getId())
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                DocumentSnapshot documentSnapshot = task.getResult();
+                                                Map<String, Object> map = documentSnapshot.getData();
+
+                                                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                                                    GeoPoint point = (GeoPoint) entry.getValue();
+                                                    String name = entry.getKey();
+                                                    GeoPoint point1 = document1.getGeoPoint("geoPoint");
+                                                    float results[] = new float[10];
+                                                    Location.distanceBetween(point.getLatitude(), point.getLongitude(), point1.getLatitude(), point1.getLongitude(), results);
+                                                    Log.d("distance from " + name + " is :", String.valueOf(results[0]));
+                                                    Toast.makeText(LocationService.this, String.valueOf(results[0]), Toast.LENGTH_SHORT).show();
+                                                    if (results[0] > 5000){
+                                                        //Show notification hererere
+                                                        Log.d("boundary", "You are out of boundary");
+                                                    }
+                                                    //Toast.makeText(CheckForLocationUpdates.this, String.valueOf(results[0]), Toast.LENGTH_SHORT).show();
+                                                    //Log.d("working", String.valueOf(results[0]));
+                                                }
+                                            }
+
+                                        });
+
+                                break;
+                            }
+                        } else {
+                            //Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+                    }
+                });
+
+
+    }
+
 
     private void getLocation() {
         try {
@@ -189,6 +253,7 @@ public class LocationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
         //timer.cancel();
         //task.cancel();
         //stopSelf();
@@ -196,6 +261,5 @@ public class LocationService extends Service {
         mFusedLocationClient.removeLocationUpdates(locationCallback);
         Log.i("stopped", "onCreate() , service stopped...");
     }
-
 
 }

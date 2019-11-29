@@ -1,12 +1,16 @@
 package com.example.digitalcare;
 
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.digitalcare.ConstantsFile.Constants;
+import com.example.digitalcare.Services.LocationService;
+import com.example.digitalcare.Services.ParentService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -24,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.widget.Toast;
 
 public class Main2Activity extends AppCompatActivity {
 
@@ -55,7 +60,45 @@ public class Main2Activity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        startLocationService();
+       /* Intent serviceIntent  = new Intent(this, LocationService.class);
+        stopService(serviceIntent);*/
+
+
+
     }
+
+
+    private void startLocationService() {
+        Intent serviceIntent  = new Intent(this, LocationService.class);
+        if (!isLocationServiceRunning()) {
+
+//        this.startService(serviceIntent);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
+                Main2Activity.this.startForegroundService(serviceIntent);
+            } else {
+                startService(serviceIntent);
+            }
+        }else{
+            stopService(serviceIntent);
+        }
+    }
+
+
+    private boolean isLocationServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if ("com.example.digitalcare.Services.LocationService".equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        //Log.d(TAG, "isLocationServiceRunning: location service is not running.");
+        return false;
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

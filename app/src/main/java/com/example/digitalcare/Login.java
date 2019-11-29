@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.digitalcare.ConstantsFile.Constants;
+import com.example.digitalcare.Services.LocationService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -100,6 +102,9 @@ public class Login extends AppCompatActivity {
                                         //editor.putString(Constants.ID,mAuth.getUid());
 
                                         editor.apply();
+
+
+
                                         startActivity(i);
                                     } else if (radioButton2.isChecked()) {
                                         i = new Intent(Login.this, ChildHome.class);

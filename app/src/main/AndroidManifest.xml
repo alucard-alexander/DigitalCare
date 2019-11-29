@@ -29,7 +29,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <service android:name=".Services.LocationService" />
+        <service android:name=".Services.LocationService"
+
+            />
+
 
         <activity android:name=".LockedScreenSignOut">
 
