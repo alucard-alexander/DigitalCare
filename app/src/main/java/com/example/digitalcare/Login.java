@@ -91,11 +91,12 @@ public class Login extends AppCompatActivity {
                                 Intent i;
                                 if (task.isSuccessful()) {
                                     progressDialog.hide();
+                                    SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+
                                     if (radioButton1.isChecked()) {
                                         i = new Intent(Login.this, Main2Activity.class);
                                         progressDialog.hide();
-                                        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
-                                        SharedPreferences.Editor editor = sharedPreferences.edit();
 
 
                                         editor.putString(Constants.TYPE, "PARENT");
@@ -107,6 +108,10 @@ public class Login extends AppCompatActivity {
 
                                         startActivity(i);
                                     } else if (radioButton2.isChecked()) {
+                                        editor.putString(Constants.TYPE, "CHILD");
+                                        //editor.putString(Constants.ID,mAuth.getUid());
+
+                                        editor.apply();
                                         i = new Intent(Login.this, ChildHome.class);
                                         progressDialog.hide();
                                         startActivity(i);
