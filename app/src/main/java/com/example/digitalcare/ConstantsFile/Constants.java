@@ -14,7 +14,7 @@ public class Constants {
     public static final String CHILD_ID = "childID";
 
 
-    public static final int PLACE_PICKER_REQUEST = 1;
+    public static final int SMS_REQUEST = 555;
 
 
 }

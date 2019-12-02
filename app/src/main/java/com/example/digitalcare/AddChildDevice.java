@@ -162,6 +162,24 @@ public class AddChildDevice extends AppCompatActivity {
 
 
     public void saveData(View view) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+
+        }else{
+            Toast.makeText(this, "Location Permission should be enabled", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (!service.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            Toast.makeText(this, "Gps should be enabled", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (ContextCompat.checkSelfPermission(this,Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS},Constants.SMS_REQUEST);
+            return;
+        }
+
         try {
             EditText ed5 = findViewById(R.id.editText5);
             if (ed5.getText().toString() == null) {
