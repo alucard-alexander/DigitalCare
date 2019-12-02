@@ -34,70 +34,119 @@
 
                 android:textSize="32dp" />
 
-            <EditText
-                android:id="@+id/editText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="20dp"
-                android:ems="10"
-                android:hint="@string/fullName"
-                android:inputType="textPersonName"
-                android:textAlignment="center" />
+            <com.google.android.material.textfield.TextInputLayout
 
-            <EditText
-                android:id="@+id/editText1"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginBottom="20dp"
-                android:ems="10"
-                android:hint="@string/regEmail"
-                android:inputType="textPersonName"
-                android:textAlignment="center" />
 
-            <EditText
-                android:id="@+id/editText2"
+                >
+
+
+                <EditText
+                    android:id="@+id/editText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/fullName"
+                    android:inputType="textPersonName" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp">
+
+                <EditText
+                    android:id="@+id/editText1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:ems="10"
+                    android:hint="@string/regEmail"
+                    android:inputType="textPersonName" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginBottom="20dp"
-                android:ems="10"
-                android:hint="@string/regPass"
-                android:inputType="textPersonName"
-                android:textAlignment="center" />
+                app:passwordToggleEnabled="true">
+
+                <EditText
+                    android:id="@+id/editText2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="@string/regPass"
+                    android:inputType="textPassword" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
+                app:passwordToggleEnabled="true">
 
             <EditText
                 android:id="@+id/editText3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="20dp"
                 android:ems="10"
                 android:hint="@string/regRePass"
-                android:inputType="textPersonName"
-                android:textAlignment="center" />
+                android:inputType="textPassword"
+                 />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
+                app:counterEnabled="true"
+                app:counterMaxLength="10">
 
             <EditText
                 android:id="@+id/editText4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/regMobile"
+                android:inputType="number"
+                android:maxLength="10"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/button10"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginBottom="20dp"
-                android:ems="10"
-                android:hint="@string/regMobile"
-                android:inputType="textPersonName"
-                android:textAlignment="center" />
+                android:background="@drawable/button_good_effect"
+                android:textColor="@color/white"
+                android:onClick="chooseFile123"
+                android:text="Choose Display Picture"
+                 />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -113,9 +162,9 @@
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="10dp"
                     android:layout_weight="1"
-                    android:background="@drawable/button_bad_effect"
+                    android:background="@drawable/button_good_effect"
                     android:text="Cancel"
-                    android:textColor="@android:color/background_dark" />
+                    android:textColor="@android:color/white" />
 
                 <Button
                     android:id="@+id/button4"
@@ -129,7 +178,7 @@
                     android:background="@drawable/button_good_effect"
                     android:onClick="registerUser"
                     android:text="Register"
-                    android:textColor="@android:color/background_dark" />
+                    android:textColor="@android:color/white" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

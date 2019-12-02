@@ -8,6 +8,9 @@ import android.os.Bundle;
 import com.example.digitalcare.ConstantsFile.Constants;
 import com.example.digitalcare.Services.LocationService;
 import com.example.digitalcare.Services.ParentService;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -26,6 +29,11 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.squareup.picasso.Picasso;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -33,57 +41,86 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class Main2Activity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
+    String ImageURL = "https://firebasestorage.googleapis.com/v0/b/digitalcare-d88ac.appspot.com/o/parent-with-children-logo_1243717.jpg?alt=media&token=1b3f3e0b-5780-4a72-9dd4-2e6dd905529f";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main2);
+            Toolbar toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+
+            //NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery)
-                .setDrawerLayout(drawer)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
-        TextView te = findViewById(R.id.textViewNavBarID);
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            NavigationView navigationView = findViewById(R.id.nav_view);
+            // changing the email
+            View headerView = navigationView.getHeaderView(0);
+            TextView navUsername = (TextView) headerView.findViewById(R.id.textViewNavBarID);
+            final TextView nameUser123 = (TextView) headerView.findViewById(R.id.nameNavBar);
+            FirebaseUser current = FirebaseAuth.getInstance().getCurrentUser();
+            //changing the DP
+            final ImageView profilePictureView = (ImageView) headerView.findViewById(R.id.imageViewNavBar);
+            //final String ImageUrl;
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        FirebaseUser current = FirebaseAuth.getInstance().getCurrentUser();
+            db.collection("person")
+                    .document(FirebaseAuth.getInstance().getUid())
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 
-        //te.setText("working");
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                ImageURL = document.getString("dpDownloadUrl");
+                                nameUser123.setText(document.getString("name"));
+                               // Log.d("ggggggggg1", ImageURL);
+                                Picasso.with(Main2Activity.this).load(ImageURL).into(profilePictureView);
+
+                            }
+                        }
+                    });
+
+            //Log.d("ggggggggg", ImageURL);
+
+
+            navUsername.setText(current.getEmail());
+            // Passing each menu ID as a set of Ids because each
+            // menu should be considered as top level destinations.
+            mAppBarConfiguration = new AppBarConfiguration.Builder(
+                    R.id.nav_home, R.id.nav_gallery)
+                    .setDrawerLayout(drawer)
+                    .build();
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+            NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+            NavigationUI.setupWithNavController(navigationView, navController);
+            TextView te = findViewById(R.id.textViewNavBarID);
+
+
+            //te.setText("working");
        /* Intent serviceIntent  = new Intent(this, LocationService.class);
         stopService(serviceIntent);*/
 
-
-
-    }
-
-
-
-
-    private boolean isLocationServiceRunning() {
-        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if ("com.example.digitalcare.Services.LocationService".equals(service.service.getClassName())) {
-                return true;
-            }
+        }catch (Exception e){
+            Log.d("eeeeeee", e.getMessage());
         }
-        //Log.d(TAG, "isLocationServiceRunning: location service is not running.");
-        return false;
+
     }
+
+
+
+
 
 
     @Override
