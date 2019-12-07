@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "829950891711-73e0sokjtu4ach3naant635a86mksmra.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.digitalcare",
+            "certificate_hash": "871a0d4ab867d047463e107534e0492a6b6903b3"
+          }
+        },
+        {
+          "client_id": "829950891711-hfg6347u5orad0lu7flforigobgbs2fr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.digitalcare",
+            "certificate_hash": "6b97f127c3b13e6fc2234814522c7d52731d5c8d"
+          }
+        },
+        {
           "client_id": "829950891711-b0h5l2km1huedkk5u5ku2io1pb275s73.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

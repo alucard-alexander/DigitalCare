@@ -67,8 +67,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         editText = findViewById(R.id.input_search);
 
-
-
         Toast.makeText(this, "Workinggggg", Toast.LENGTH_SHORT).show();
     }
 
@@ -125,8 +123,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             /*childareaname childareaname1 = new childareaname();
             childareaname1.show(getSupportFragmentManager(),"Area name");*/
 
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Area Name");
             builder.setMessage("Enter Area name! single word is recommended");
             final EditText input123 = new EditText(this);
@@ -146,7 +143,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             MarkerDetails md = new MarkerDetails(txt, gp);
                             mark.add(md);
                             moveCameraSetMarker(latLng, txt);
-
+                            dialog.dismiss();
 
                         } else {
                             Toast.makeText(MapsActivity.this, "Enter the place name", Toast.LENGTH_SHORT).show();
@@ -159,7 +156,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
 
-            builder.create().show();
+
+
+            builder.create();
+
+
             /*AlertDialog ad = builder.create();
             ad.show();*/
 
