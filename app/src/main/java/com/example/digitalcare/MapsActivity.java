@@ -48,7 +48,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private EditText editText;
     private String searchString;
-
     private LatLng latLng;
     private ArrayList<MarkerDetails> mark = new ArrayList<>();
 
@@ -116,6 +115,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         if (list.size() > 0) {
+
+
+
+
+
             final Address address = list.get(0);
 
             Log.d("addressss", "address: " + address.toString());
@@ -143,7 +147,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             MarkerDetails md = new MarkerDetails(txt, gp);
                             mark.add(md);
                             moveCameraSetMarker(latLng, txt);
-                            dialog.dismiss();
+                            //dialog.cancel();
 
                         } else {
                             Toast.makeText(MapsActivity.this, "Enter the place name", Toast.LENGTH_SHORT).show();
@@ -158,7 +162,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-            builder.create();
+            builder.create().show();
 
 
             /*AlertDialog ad = builder.create();
