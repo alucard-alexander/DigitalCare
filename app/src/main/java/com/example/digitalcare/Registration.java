@@ -83,7 +83,7 @@ public class Registration extends AppCompatActivity {
                             } else {
                                 // If sign in fails, display a message to the user.
                                 progressDialog.hide();
-                                Toast.makeText(Registration.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Registration.this, "Email already exists", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -263,4 +263,12 @@ public class Registration extends AppCompatActivity {
             selectImage();
         }
     }
+
+
+    public void cancel1(View view)
+    {
+        Intent i = new Intent(this,Login.class);
+        startActivity(i);
+    }
+
 }

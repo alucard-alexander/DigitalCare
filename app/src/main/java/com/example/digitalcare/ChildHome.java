@@ -17,7 +17,7 @@ public class ChildHome extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_child_home);
         auth = FirebaseAuth.getInstance();
-        Toast.makeText(this, auth.getUid(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, auth.getUid(), Toast.LENGTH_SHORT).show();
     }
 
     public void addDevice(View view){

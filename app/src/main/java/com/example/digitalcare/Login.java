@@ -46,44 +46,34 @@ public class Login extends AppCompatActivity {
         radioButton2 = findViewById(R.id.radioButton2);
         textView = findViewById(R.id.textView2);
         mAuth = FirebaseAuth.getInstance();
-        //mAuth.signOut();
-        /*if (mAuth.getCurrentUser().getEmail() != null) {
-            FirebaseUser user= mAuth.getCurrentUser();
-            Toast.makeText(this, user.getEmail(), Toast.LENGTH_SHORT).show();
-        }*/
-        /*if (mAuth.getUid() != null){
-            Intent i = new Intent(Login.this,Main2Activity.class);
-            startActivity(i);
-        }*/
 
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
         String type = sharedPreferences.getString(Constants.TYPE, "");
         String childID = sharedPreferences.getString(Constants.CHILD_ID, "");
 
-        Toast.makeText(this, type, Toast.LENGTH_SHORT).show();
+
         if (type.equals("CHILD") && !childID.equals("") && mAuth != null) {
             Intent i = new Intent(this, LockedScreenSignOut.class);
+            Toast.makeText(this, type, Toast.LENGTH_SHORT).show();
             startActivity(i);
-        } else if (type.equals("PARENT") && mAuth.getUid() != null ) {
+        } else if (type.equals("PARENT") && mAuth.getUid() != null) {
             Intent i = new Intent(this, Main2Activity.class);
+            Toast.makeText(this, type, Toast.LENGTH_SHORT).show();
             startActivity(i);
         }
 
-        //Toast.makeText(this, mAuth.getUid(), Toast.LENGTH_SHORT).show();
     }
 
 
     public void loginUser(View view) {
+
+        emailStr = email.getText().toString();
+        passStr = pass.getText().toString();
         progressDialog.setMessage("Trying to login");
+        progressDialog.setCancelable(false);
         progressDialog.show();
-        if (!email.getText().toString().isEmpty()) {
-            if (!pass.getText().toString().isEmpty()) {
-                //Toast.makeText(this, "Working", Toast.LENGTH_SHORT).show();
-                //SharedPreferences sharedPreferences = getSharedPreferences(MyConstants.sharedPreferencekey,MODE_PRIVATE);
-                //SharedPreferences.Editor editor = sharedPreferences.edit();
-                //SaveSha
-                emailStr = email.getText().toString();
-                passStr = pass.getText().toString();
+        if (!emailStr.isEmpty()) {
+            if (!passStr.isEmpty()) {
                 mAuth.signInWithEmailAndPassword(emailStr, passStr)
                         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
@@ -97,15 +87,8 @@ public class Login extends AppCompatActivity {
                                     if (radioButton1.isChecked()) {
                                         i = new Intent(Login.this, Main2Activity.class);
                                         progressDialog.hide();
-
-
                                         editor.putString(Constants.TYPE, "PARENT");
-                                        //editor.putString(Constants.ID,mAuth.getUid());
-
                                         editor.apply();
-
-
-
                                         startActivity(i);
                                     } else if (radioButton2.isChecked()) {
                                         editor.putString(Constants.TYPE, "CHILD");
@@ -120,7 +103,6 @@ public class Login extends AppCompatActivity {
                                         progressDialog.hide();
                                         Toast.makeText(Login.this, "Please select Type", Toast.LENGTH_SHORT).show();
                                     }
-
                                 } else {
                                     progressDialog.hide();
                                     Toast.makeText(Login.this, "Sign in failed, Try registered user Name and password", Toast.LENGTH_SHORT).show();
@@ -128,9 +110,11 @@ public class Login extends AppCompatActivity {
                             }
                         });
             } else {
+                progressDialog.hide();
                 Toast.makeText(this, "Please enter your password", Toast.LENGTH_SHORT).show();
             }
         } else {
+            progressDialog.hide();
             Toast.makeText(this, "Please Enter registered email", Toast.LENGTH_SHORT).show();
         }
 
@@ -139,5 +123,15 @@ public class Login extends AppCompatActivity {
     public void registerPage(View view) {
         Intent i = new Intent(this, Registration.class);
         startActivity(i);
+    }
+
+    public void forgotPassword(View view) {
+        Intent i = new Intent(this, ForgotPassword.class);
+        startActivity(i);
+    }
+
+    public void reset1(View view) {
+        email.setText("");
+        pass.setText("");
     }
 }

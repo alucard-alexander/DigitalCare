@@ -175,7 +175,7 @@ public class LocationService extends Service {
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        Toast.makeText(LocationService.this, "Success", Toast.LENGTH_SHORT).show();
+                                       // Toast.makeText(LocationService.this, "Success", Toast.LENGTH_SHORT).show();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -201,7 +201,7 @@ public class LocationService extends Service {
                                             float results[] = new float[10];
                                             Location.distanceBetween(point.getLatitude(), point.getLongitude(), point1.getLatitude(), point1.getLongitude(), results);
                                             Log.d("distance from " + name + " is :", String.valueOf(results[0]));
-                                            Toast.makeText(LocationService.this, String.valueOf(results[0]), Toast.LENGTH_SHORT).show();
+                                            //Toast.makeText(LocationService.this, String.valueOf(results[0]), Toast.LENGTH_SHORT).show();
                                             if (results[0] < 5000) {
                                                 //Show notification hererere
                                                 Log.d("boundary", "You are out of boundary");
@@ -224,7 +224,7 @@ public class LocationService extends Service {
 
 
                         String str1 = String.valueOf(location.getLatitude()) + " " + String.valueOf(location.getLongitude());
-                        Toast.makeText(LocationService.this, str1, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(LocationService.this, str1, Toast.LENGTH_SHORT).show();
                     }
                 }
             };
@@ -253,18 +253,18 @@ public class LocationService extends Service {
     }
 
     private void sendSMS(){
-        /*if (checkPermission(Manifest.permission.SEND_SMS)){
-
-        }else{
-            ActivityCompat.requestPermissions(,
-                    new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_REQUEST_CODE);
-        }*/
-
-        SmsManager smsManager = SmsManager.getDefault();
-        smsManager.sendTextMessage("8722255043",null,"your child is out of boundary",null,null);
 
 
-
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("person").document(FirebaseAuth.getInstance().getUid())
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        SmsManager smsManager = SmsManager.getDefault();
+                        smsManager.sendTextMessage(documentSnapshot.getString("mobile"),null,"your child is out of boundary",null,null);
+                    }
+                });
     }
 
 

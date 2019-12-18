@@ -66,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         editText = findViewById(R.id.input_search);
 
-        Toast.makeText(this, "Workinggggg", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Workinggggg", Toast.LENGTH_SHORT).show();
     }
 
     private void init() {
@@ -97,7 +97,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(latLng).title(name));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         String thi = String.valueOf(mark.size());
-        Toast.makeText(this, thi, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, thi+" markers added", Toast.LENGTH_SHORT).show();
     }
 
     private void geoLocate() {

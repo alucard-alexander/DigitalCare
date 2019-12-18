@@ -162,21 +162,19 @@ public class AddChildDevice extends AppCompatActivity {
 
 
     public void saveData(View view) {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-
-        }else{
+        if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
             Toast.makeText(this, "Location Permission should be enabled", Toast.LENGTH_SHORT).show();
             return;
         }
+
         LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (!service.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+        if (!service.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Toast.makeText(this, "Gps should be enabled", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (ContextCompat.checkSelfPermission(this,Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS},Constants.SMS_REQUEST);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, Constants.SMS_REQUEST);
             return;
         }
 
@@ -254,7 +252,6 @@ public class AddChildDevice extends AppCompatActivity {
 
                                                                             SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
                                                                             SharedPreferences.Editor editor = sharedPreferences.edit();
-
 
 
                                                                             editor.putString(Constants.TYPE, "CHILD");
