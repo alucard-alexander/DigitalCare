@@ -27,6 +27,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.concurrent.locks.Lock;
+
 public class LockedScreenSignOut extends AppCompatActivity {
 
     private Intent serviceIntent;
@@ -103,7 +105,7 @@ public class LockedScreenSignOut extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                //Toast.makeText(LockedScreenSignOut.this, "Working", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LockedScreenSignOut.this, "Working", Toast.LENGTH_SHORT).show();
                                 signout();
                             } else {
                                 progressDialog.hide();
@@ -141,74 +143,79 @@ public class LockedScreenSignOut extends AppCompatActivity {
 
 
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String childID = sharedPreferences.getString(Constants.CHILD_ID, "");
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+        final String childID = sharedPreferences.getString(Constants.CHILD_ID, "");
 
         db.collection("child").document(childID)
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        //Toast.makeText(LockedScreenSignOut.this, "Deleted child document", Toast.LENGTH_SHORT).show();
+                        db.collection("Allowed_Markers").document(childID)
+                                .delete()
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        //Toast.makeText(LockedScreenSignOut.this, "deleted allowed markers", Toast.LENGTH_SHORT).show();
+                                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                                        StorageReference storageRef = storage.getReference();
+                                        String name = "childDp/" + childID + ".jpg";
+                                        StorageReference desertRef = storageRef.child(name);
 
+                                        desertRef.delete()
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                       // Toast.makeText(LockedScreenSignOut.this, "Deleted your photo", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(LockedScreenSignOut.this, "Successfully deleted", Toast.LENGTH_SHORT).show();
+
+                                                        editor.putString(Constants.TYPE, "");
+                                                        editor.putString(Constants.CHILD_ID, "");
+                                                        editor.apply();
+
+                                                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+                                                        mAuth.signOut();
+
+                                                        Intent i = new Intent(LockedScreenSignOut.this, Login.class);
+                                                        startActivity(i);
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Toast.makeText(LockedScreenSignOut.this, "Failed to delete your photo", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+
+                                        //StorageReference photoRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://digitalcare-d88ac.appspot.com/childDp/ZVnwAljAjCrJ27BM1IRn.jpg");
+
+
+
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(LockedScreenSignOut.this, "Not deleted allowed markers", Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(LockedScreenSignOut.this, "Not able to delete child document", Toast.LENGTH_SHORT).show();
 
                     }
                 });
 
-        db.collection("Allowed_Markers").document(childID)
-                .delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
 
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
 
-                    }
-                });
-
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference();
-        String name = "childDp/" + childID + ".jpg";
-        StorageReference desertRef = storageRef.child(name);
-
-        desertRef.delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(LockedScreenSignOut.this, "Deleted your photo", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(LockedScreenSignOut.this, "Failed to delete your photo", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        //StorageReference photoRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://digitalcare-d88ac.appspot.com/childDp/ZVnwAljAjCrJ27BM1IRn.jpg");
-
-        Toast.makeText(this, "Successfully deleted", Toast.LENGTH_SHORT).show();
-
-        editor.putString(Constants.TYPE, "");
-        editor.putString(Constants.CHILD_ID, "");
-        editor.apply();
-
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-
-        mAuth.signOut();
-
-        Intent i = new Intent(this, Login.class);
-        startActivity(i);
 
 
     }
