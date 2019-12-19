@@ -54,7 +54,7 @@ public class LockedScreenSignOut extends AppCompatActivity {
 
     private void startLocationService() {
         if (!isLocationServiceRunning()) {
-            serviceIntent  = new Intent(this, LocationService.class);
+            serviceIntent = new Intent(this, LocationService.class);
 //        this.startService(serviceIntent);
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -78,15 +78,16 @@ public class LockedScreenSignOut extends AppCompatActivity {
         return false;
     }
 
-    public void checkPassword(View view){
+    public void checkPassword(View view) {
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Signing out this device ");
         progressDialog.setCancelable(false);
         progressDialog.show();
         EditText editText = findViewById(R.id.editText6);
         String pass = editText.getText().toString();
-        if (pass.isEmpty()){
+        if (pass.isEmpty()) {
             Toast.makeText(this, "Please Enter your password", Toast.LENGTH_SHORT).show();
+            progressDialog.hide();
             return;
         }
         try {
@@ -96,15 +97,15 @@ public class LockedScreenSignOut extends AppCompatActivity {
             //mAuth.signInWithEmailAndPassword(mAuth.getCurrentUser().getEmail(), pass);
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-            AuthCredential credential = EmailAuthProvider.getCredential(mAuth.getCurrentUser().getEmail(),pass);
+            AuthCredential credential = EmailAuthProvider.getCredential(mAuth.getCurrentUser().getEmail(), pass);
             user.reauthenticate(credential)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
+                            if (task.isSuccessful()) {
                                 //Toast.makeText(LockedScreenSignOut.this, "Working", Toast.LENGTH_SHORT).show();
                                 signout();
-                            }else{
+                            } else {
                                 progressDialog.hide();
                                 Toast.makeText(LockedScreenSignOut.this, "Wrong Password", Toast.LENGTH_SHORT).show();
                             }
@@ -112,10 +113,9 @@ public class LockedScreenSignOut extends AppCompatActivity {
                     });
 
             //Toast.makeText(this, String.valueOf(user.getProviderId()), Toast.LENGTH_SHORT).show();
-        }catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
-
 
 
     }
@@ -137,15 +137,14 @@ public class LockedScreenSignOut extends AppCompatActivity {
             }
 
 
-
         }
 
 
-        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE,MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String childID = sharedPreferences.getString(Constants.CHILD_ID,"");
+        String childID = sharedPreferences.getString(Constants.CHILD_ID, "");
 
         db.collection("child").document(childID)
                 .delete()
@@ -179,7 +178,7 @@ public class LockedScreenSignOut extends AppCompatActivity {
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
-        String name = "childDp/"+childID+".jpg";
+        String name = "childDp/" + childID + ".jpg";
         StorageReference desertRef = storageRef.child(name);
 
         desertRef.delete()
@@ -200,14 +199,15 @@ public class LockedScreenSignOut extends AppCompatActivity {
 
         Toast.makeText(this, "Successfully deleted", Toast.LENGTH_SHORT).show();
 
-        editor.putString(Constants.TYPE,"");
-        editor.putString(Constants.CHILD_ID,"");
+        editor.putString(Constants.TYPE, "");
+        editor.putString(Constants.CHILD_ID, "");
         editor.apply();
 
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();;
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
         mAuth.signOut();
 
-        Intent i = new Intent(this,Login.class);
+        Intent i = new Intent(this, Login.class);
         startActivity(i);
 
 
